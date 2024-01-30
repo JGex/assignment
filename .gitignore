@@ -17,9 +17,9 @@ yarn-error.log
 
 # composer
 /vendor
+.php-cs-fixer.cache
 
 # OS / ide
 .idea
 /.fleet
 /.vscode
-

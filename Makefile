@@ -80,7 +80,7 @@ sail-purge: ## Remove all containers in the docker-compose
 	@$(PRE_CMD)
 	$(SAIL) down --rmi all --remove-orphans
 
-sail-log: ## TAIL="20" Display the $(TAIL) last logs of the container $(CONTAINER) if no container provided, display for all containers
+sail-log: ## TAIL="20" CONTAINER="" Display the $(TAIL) last logs of the container $(CONTAINER) if no container provided, display for all containers
 	@$(PRE_CMD)
 	$(SAIL) logs -f --tail="$(TAIL)" $(CONTAINER)
 
