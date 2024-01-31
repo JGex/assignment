@@ -2,7 +2,11 @@
 
 namespace App\Exceptions;
 
+use App\Http\Exception\AbstractApiRequestException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Response;
+use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 use Throwable;
 
 class Handler extends ExceptionHandler
@@ -26,5 +30,33 @@ class Handler extends ExceptionHandler
         $this->reportable(function (Throwable $e) {
             //
         });
+    }
+
+    public function render($request, Throwable $e): JsonResponse
+    {
+        $status = Response::HTTP_INTERNAL_SERVER_ERROR;
+        $data = [
+            'success' => false,
+            'code' => $e->getCode(),
+            'message' => [
+                $e->getMessage(),
+            ],
+        ];
+
+        if (env('APP_ENV') !== 'production') {
+            $data['file'] = $e->getFile();
+            $data['line'] = $e->getLine();
+            $data['trace'] = $e->getTrace();
+            $data['previous'] = $e->getPrevious();
+        }
+
+        if ($e instanceof BadRequestException) {
+            $status = Response::HTTP_BAD_REQUEST;
+        } elseif ($e instanceof AbstractApiRequestException) {
+            $status = $e->getStatus();
+            $data['details'] = $e->getDetails();
+        }
+
+        return new JsonResponse($data, $status);
     }
 }
