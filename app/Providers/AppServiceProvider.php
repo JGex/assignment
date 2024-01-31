@@ -4,8 +4,10 @@ namespace App\Providers;
 
 use App\Console\Commands\ImportProduct;
 use App\Domain\FakeStore\Services\FakeStoreApiClient;
+use App\Http\RequestDecorator;
 use App\Models\Repository\CategoryRepository;
 use App\Models\Repository\ProductRepository;
+use Illuminate\Http\Request;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -15,6 +17,12 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
+        // Decorate the Illuminate Request to be sur will only receive json response
+        $this->app->bind(
+            Request::class,
+            fn () => $this->app->make(RequestDecorator::class)
+        );
+
         $this->app->tag(
             [FakeStoreApiClient::class],
             'import.product.source'
