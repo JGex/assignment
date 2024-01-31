@@ -1,3 +1,8 @@
+# Requirements
+
+- [Docker](https://www.docker.com/)
+
+
 # Installation
 
 You must create a `.env` file
