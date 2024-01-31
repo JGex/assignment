@@ -30,11 +30,7 @@ class AppServiceProvider extends ServiceProvider
 
         $this->app->bind(
             FakeStoreApiClient::class,
-            function () {
-                return new FakeStoreApiClient(
-                    env('FAKE_STORE_API_URL')
-                );
-            }
+            fn () => new FakeStoreApiClient(env('FAKE_STORE_API_URL'))
         );
 
         $this->app->bind(
