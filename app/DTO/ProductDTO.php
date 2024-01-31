@@ -3,6 +3,7 @@
 namespace App\DTO;
 
 use App\DTO\Exceptions\ProductValidationException;
+use App\Models\Product;
 use Illuminate\Support\Facades\Validator;
 
 class ProductDTO
@@ -64,6 +65,20 @@ class ProductDTO
         return $productDTO;
     }
 
+    public static function fromModel(Product $product): self
+    {
+        return new self([
+            'id' => $product->id,
+            'title' => $product->title,
+            'price' => $product->price,
+            'description' => $product->description,
+            'categoryName' => $product->category->name,
+            'image' => $product->image,
+            'rating' => json_decode($product->rating, true),
+            'fakeStoreId' => $product->fake_store_id,
+        ]);
+    }
+
     /**
      * @return array<string, mixed>
      */
@@ -79,5 +94,14 @@ class ProductDTO
             'rating' => $this->rating,
             'fakeStoreId' => $this->fakeStoreId,
         ];
+    }
+
+    public function updateFromContent(array $content): void
+    {
+        foreach ($content as $property => $value) {
+            if (property_exists($this, $property)) {
+                $this->$property = $value;
+            }
+        }
     }
 }

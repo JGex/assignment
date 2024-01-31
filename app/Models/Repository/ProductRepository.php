@@ -5,6 +5,8 @@ namespace App\Models\Repository;
 use App\DTO\ProductDTO;
 use App\Models\Category;
 use App\Models\Product;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Collection;
 
 class ProductRepository
@@ -31,6 +33,21 @@ class ProductRepository
                 'image',
                 'rating',
             ]
+        );
+    }
+
+    /**
+     * @throws \JsonException
+     * @throws ModelNotFoundException<Model>
+     */
+    public function updateFromAPI(int $productId, array $content): void
+    {
+        $productModel = Product::findOrFail($productId);
+        $productDTO = ProductDTO::fromModel($productModel);
+        $productDTO->updateFromContent($content);
+
+        $productModel->update(
+            $this->transformFromDTO($productDTO)
         );
     }
 
