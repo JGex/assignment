@@ -5,6 +5,7 @@ namespace App\DTO\Exceptions;
 class ProductValidationException extends AbstractValidationException
 {
     const int PRODUCT_VALIDATION_ERROR = 20000;
+    const string IDENTIFIER_NAME = 'Product ID';
 
     public function __construct(
         private readonly int $productId,

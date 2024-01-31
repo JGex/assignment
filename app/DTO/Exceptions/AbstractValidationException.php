@@ -13,5 +13,10 @@ abstract class AbstractValidationException extends \Exception
         }, $this->details);
     }
 
+    public function getIdentifierName(): string
+    {
+        return $this::IDENTIFIER_NAME;
+    }
+
     abstract protected function getIdentifier(): string;
 }

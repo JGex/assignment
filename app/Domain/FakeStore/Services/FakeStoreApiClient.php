@@ -9,7 +9,7 @@ use App\DTO\Exceptions\CategoryValidationException;
 use App\DTO\Exceptions\ProductValidationException;
 use App\DTO\ProductDTO;
 use App\Importer\ProductImporterInterface;
-use Illuminate\Http\Client\RequestException;
+use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Http;
 
@@ -76,7 +76,7 @@ class FakeStoreApiClient extends AbstractApiClient implements ProductImporterInt
                     ],
                 ]);
             }
-        } catch (RequestException $e) {
+        } catch (ConnectionException $e) {
             // If the error is not a FakeStoreApiClientException, transform it
             $details = [
                 'url' => $url,
@@ -89,7 +89,7 @@ class FakeStoreApiClient extends AbstractApiClient implements ProductImporterInt
                 ];
             }
 
-            FakeStoreApiClientException::unhandledException($details);
+            FakeStoreApiClientException::gatewayFetchError($details);
         }
 
         return $response->json();

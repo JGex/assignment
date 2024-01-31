@@ -2,8 +2,7 @@
 
 namespace App\Console\Commands;
 
-use App\DTO\Exceptions\CategoryValidationException;
-use App\DTO\Exceptions\ProductValidationException;
+use App\DTO\Exceptions\AbstractValidationException;
 use App\Importer\Exception\ProductImporterException;
 use App\Importer\ProductImporterInterface;
 use App\Models\Repository\CategoryRepository;
@@ -42,34 +41,25 @@ class ImportProduct extends Command
             $this->info('Start importing products...');
             $this->productRepository->createFromCollection($this->source->getProducts());
         } catch (\InvalidArgumentException $e) {
-            $this->log($e);
-            $this->error($e->getMessage());
-
-            return self::FAILURE;
-        } catch (ProductValidationException $e) {
-            $this->log($e);
-            $this->error('An error occurred with a product, process has been stopped');
-            $this->table(['Product id', 'errors'], $e->getDetails());
-
-            return self::FAILURE;
-        } catch (CategoryValidationException $e) {
-            $this->log($e);
-            $this->error('An error occurred with a category, process has been stopped');
-            $this->table(['Category name', 'errors'], $e->getDetails());
-
-            return self::FAILURE;
-        } catch (\JsonException $e) {
-            $this->log($e);
-            $this->error('An error occurred with a product, process has been stopped');
-            $this->warn(sprintf('Details : %s', $e->getMessage()));
-
-            return self::FAILURE;
-        } catch (ProductImporterException $e) {
-            $this->log($e);
-            $this->error($e->getMessage());
-            $this->warn(sprintf('Details : %s', json_encode($e->getDetails())));
-
-            return self::FAILURE;
+            return $this->logAndFail(
+                $e,
+                $e->getMessage(),
+            );
+        } catch (AbstractValidationException $e) {
+            return $this->logAndFail(
+                $e,
+                'An error occurred, process has been stopped',
+                [
+                    'header' => [$e->getIdentifierName(), 'errors'],
+                    'rows' => $e->getDetails(),
+                ]
+            );
+        } catch (ProductImporterException|\JsonException $e) {
+            return $this->logAndFail(
+                e: $e,
+                message: 'An error occurred with a product, process has been stopped',
+                details: $e->getMessage(),
+            );
         }
 
         $this->info('Process terminated with success');
@@ -98,5 +88,21 @@ class ImportProduct extends Command
             'domain' => 'PRODUCT',
             'exception' => $e,
         ]);
+    }
+
+    private function logAndFail(\Exception $e, string $message, array $table = [], ?string $details = null): int
+    {
+        $this->log($e);
+        $this->error($message);
+
+        if (!empty($table)) {
+            $this->table($table['header'], $table['rows']);
+        }
+
+        if (!empty($details)) {
+            $this->warn(sprintf('Details : %s', $details));
+        }
+
+        return self::FAILURE;
     }
 }

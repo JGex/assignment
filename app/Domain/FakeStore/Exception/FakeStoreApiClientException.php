@@ -12,15 +12,12 @@ class FakeStoreApiClientException extends \Exception implements ProductImporterE
     public function __construct(
         string $message,
         int $code,
-        private readonly array $details = [],
+        array $details,
         \Throwable $previous = null
     ) {
-        parent::__construct($message, $code, $previous);
-    }
+        $message .= "\r\n".json_encode($details);
 
-    public function getDetails(): array
-    {
-        return $this->details;
+        parent::__construct($message, $code, $previous);
     }
 
     /**
@@ -39,7 +36,7 @@ class FakeStoreApiClientException extends \Exception implements ProductImporterE
     /**
      * @throws FakeStoreApiClientException
      */
-    public static function unhandledException(array $details = [], \Throwable $previous = null): void
+    public static function gatewayFetchError(array $details = [], \Throwable $previous = null): void
     {
         throw new self(
             'Error when fetching the Fake Store API',

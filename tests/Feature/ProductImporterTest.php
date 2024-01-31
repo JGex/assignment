@@ -11,18 +11,18 @@ class ProductImporterTest extends TestCase
 {
     use RefreshDatabase;
 
-    private ?string $fakeStoreAPIProductsURL = null;
-    private ?string $fakeStoreAPICategoriesURL = null;
+    private ?string $fakeStoreApiProductsURL = null;
+    private ?string $fakeStoreApiCategoriesURL = null;
 
     public function setUp(): void
     {
         parent::setUp();
 
-        $this->fakeStoreAPIProductsURL = sprintf(
+        $this->fakeStoreApiProductsURL = sprintf(
             '%s/products',
             env('FAKE_STORE_API_URL')
         );
-        $this->fakeStoreAPICategoriesURL = sprintf(
+        $this->fakeStoreApiCategoriesURL = sprintf(
             '%s/products/categories',
             env('FAKE_STORE_API_URL')
         );
@@ -45,15 +45,14 @@ class ProductImporterTest extends TestCase
     public function test_import_category_importer_exception(): void
     {
         Http::fake([
-            $this->fakeStoreAPICategoriesURL => Http::response(['error' => 'test'], 404),
+            $this->fakeStoreApiCategoriesURL => Http::response(['error' => 'test'], 404),
         ]);
 
         $this
             ->artisan('product:import FakeStore')
-            ->expectsOutput('Error when receiving the response from Fake Store API')
-            ->expectsOutput(sprintf(
-                'Details : {"url":%s,"response":{"status":404,"body":"{\"error\":\"test\"}"}}',
-                json_encode($this->fakeStoreAPICategoriesURL)
+            ->expectsOutputToContain(sprintf(
+                '{"url":%s,"response":{"status":404,"body":"{\"error\":\"test\"}"}}',
+                json_encode($this->fakeStoreApiCategoriesURL)
             ))
             ->assertExitCode(Command::FAILURE);
 
@@ -65,18 +64,17 @@ class ProductImporterTest extends TestCase
     public function test_import_product_importer_exception(): void
     {
         Http::fake([
-            $this->fakeStoreAPICategoriesURL => Http::response([
+            $this->fakeStoreApiCategoriesURL => Http::response([
                 'test cat',
             ]),
-            $this->fakeStoreAPIProductsURL => Http::response(['error' => 'test'], 500),
+            $this->fakeStoreApiProductsURL => Http::response(['error' => 'test'], 500),
         ]);
 
         $this
             ->artisan('product:import FakeStore')
-            ->expectsOutput('Error when receiving the response from Fake Store API')
-            ->expectsOutput(sprintf(
-                'Details : {"url":%s,"response":{"status":500,"body":"{\"error\":\"test\"}"}}',
-                json_encode($this->fakeStoreAPIProductsURL)
+            ->expectsOutputToContain(sprintf(
+                '{"url":%s,"response":{"status":500,"body":"{\"error\":\"test\"}"}}',
+                json_encode($this->fakeStoreApiProductsURL)
             ))
             ->assertExitCode(Command::FAILURE);
 
@@ -88,14 +86,14 @@ class ProductImporterTest extends TestCase
     public function test_import_category_validation_exception(): void
     {
         Http::fake([
-            $this->fakeStoreAPICategoriesURL => Http::response([
+            $this->fakeStoreApiCategoriesURL => Http::response([
                 '',
             ]),
         ]);
 
         $this
             ->artisan('product:import FakeStore')
-            ->expectsOutput('An error occurred with a category, process has been stopped')
+            ->expectsOutput('An error occurred, process has been stopped')
             ->expectsOutputToContain('The name field is required.')
             ->assertExitCode(Command::FAILURE);
 
@@ -107,17 +105,17 @@ class ProductImporterTest extends TestCase
     public function test_import_product_validation_exception(): void
     {
         Http::fake([
-            $this->fakeStoreAPICategoriesURL => Http::response([
+            $this->fakeStoreApiCategoriesURL => Http::response([
                 'test cat',
             ]),
-            $this->fakeStoreAPIProductsURL => Http::response([
+            $this->fakeStoreApiProductsURL => Http::response([
                 $this->createRandomProductDTO(['category' => 'test cat', 'price' => 0]),
             ]),
         ]);
 
         $this
             ->artisan('product:import FakeStore')
-            ->expectsOutput('An error occurred with a product, process has been stopped')
+            ->expectsOutput('An error occurred, process has been stopped')
             ->expectsOutputToContain('The price field must be greater than 0.')
             ->assertExitCode(Command::FAILURE);
 
@@ -129,12 +127,12 @@ class ProductImporterTest extends TestCase
     public function test_import_product_and_update(): void
     {
         Http::fake([
-            $this->fakeStoreAPICategoriesURL => Http::response([
+            $this->fakeStoreApiCategoriesURL => Http::response([
                 'test cat 1',
                 'test cat 2',
                 'test cat 3',
             ]),
-            $this->fakeStoreAPIProductsURL => Http::response([
+            $this->fakeStoreApiProductsURL => Http::response([
                 $this->createRandomProductDTO(['category' => 'test cat 1']),
                 $this->createRandomProductDTO(['category' => 'test cat 1']),
                 $this->createRandomProductDTO(['category' => 'test cat 1']),
