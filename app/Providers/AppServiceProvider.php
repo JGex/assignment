@@ -22,6 +22,7 @@ class AppServiceProvider extends ServiceProvider
             Request::class,
             fn () => $this->app->make(RequestDecorator::class)
         );
+        $this->app->alias('request', Request::class);
 
         $this->app->tag(
             [FakeStoreApiClient::class],
