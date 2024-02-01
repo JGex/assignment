@@ -52,6 +52,8 @@ class Handler extends ExceptionHandler
 
         if ($e instanceof BadRequestException) {
             $status = Response::HTTP_BAD_REQUEST;
+        } elseif ($e instanceof ModelNotFoundException) {
+            $status = Response::HTTP_NOT_FOUND;
         } elseif ($e instanceof AbstractApiRequestException) {
             $status = $e->getStatus();
             $data['details'] = $e->getDetails();
