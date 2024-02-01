@@ -16,6 +16,11 @@ use OpenApi\Attributes as OA;
 #[
     OA\Info(version: "1.0.0", description: "Product API", title: "product-api Documentation"),
     OA\Server(url: 'http://localhost', description: "local server"),
+    OA\SecurityScheme(
+        securityScheme: "bearerAuth",
+        type: "http",
+        scheme: "bearer"
+    )
 ]
 class ProductController extends Controller
 {
@@ -27,9 +32,12 @@ class ProductController extends Controller
     #[OA\Get(
         path: '/api/product',
         summary: 'Get a list of products',
+        security: [
+            ['bearerAuth' => []],
+        ],
         responses: [
             new OA\Response(
-                response:200,
+                response: 200,
                 description: "Successful operation"
             ),
         ]
@@ -42,7 +50,10 @@ class ProductController extends Controller
     #[OA\Get(
         path: '/api/product/{id}',
         summary: 'Get a product',
-        parameters:[ new OA\Parameter(
+        security: [
+            ['bearerAuth' => []],
+        ],
+        parameters: [new OA\Parameter(
             name: "id",
             description: "id of the product",
             in: 'path',
@@ -50,11 +61,11 @@ class ProductController extends Controller
         )],
         responses: [
             new OA\Response(
-                response:200,
+                response: 200,
                 description: "Successful operation"
             ),
             new OA\Response(
-                response:404,
+                response: 404,
                 description: "Product not found"
             ),
         ]
@@ -72,19 +83,22 @@ class ProductController extends Controller
     #[OA\Put(
         path: '/api/product/{id}',
         summary: 'Update a product',
+        security: [
+            ['bearerAuth' => []],
+        ],
         requestBody: new OA\RequestBody(required: true,
-            content: new OA\MediaType(mediaType: "application/json",
+            content: new OA\MediaType(mediaType: "x-www-form-urlencoded",
                 schema: new OA\Schema(
                     properties: [
                         new OA\Property(property: 'title', description: "Product title", type: "string"),
                         new OA\Property(property: 'price', description: "Product description", type: "float"),
                         new OA\Property(property: 'description', description: "Product price", type: "string"),
-                        new OA\Property(property: 'image', description: "image of the product", type: "string")
+                        new OA\Property(property: 'image', description: "image of the product", type: "string"),
                     ]
                 )
             )
         ),
-        parameters:[ new OA\Parameter(
+        parameters: [new OA\Parameter(
             name: "id",
             description: "id of the product",
             in: 'path',
@@ -92,15 +106,15 @@ class ProductController extends Controller
         )],
         responses: [
             new OA\Response(
-                response:201,
+                response: 204,
                 description: "Product successfully updated"
             ),
             new OA\Response(
-                response:404,
+                response: 404,
                 description: "Product not found"
             ),
             new OA\Response(
-                response:500,
+                response: 500,
                 description: "When an error occure"
             ),
         ]

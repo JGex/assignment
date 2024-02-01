@@ -20,7 +20,12 @@
                     "200": {
                         "description": "Successful operation"
                     }
-                }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
             }
         },
         "/api/product/{id}": {
@@ -42,7 +47,12 @@
                     "404": {
                         "description": "Product not found"
                     }
-                }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
             },
             "put": {
                 "summary": "Update a product",
@@ -58,7 +68,7 @@
                 "requestBody": {
                     "required": true,
                     "content": {
-                        "application/json": {
+                        "x-www-form-urlencoded": {
                             "schema": {
                                 "properties": {
                                     "title": {
@@ -85,13 +95,29 @@
                     }
                 },
                 "responses": {
-                    "201": {
+                    "204": {
                         "description": "Product successfully updated"
                     },
                     "404": {
                         "description": "Product not found"
+                    },
+                    "500": {
+                        "description": "When an error occure"
                     }
-                }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        }
+    },
+    "components": {
+        "securitySchemes": {
+            "bearerAuth": {
+                "type": "http",
+                "scheme": "bearer"
             }
         }
     }
