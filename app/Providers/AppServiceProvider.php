@@ -9,6 +9,7 @@ use App\Models\Repository\CategoryRepository;
 use App\Models\Repository\ProductRepository;
 use Illuminate\Http\Request;
 use Illuminate\Support\ServiceProvider;
+use L5Swagger\L5SwaggerServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -49,6 +50,8 @@ class AppServiceProvider extends ServiceProvider
                 );
             }
         );
+
+        $this->app->register(L5SwaggerServiceProvider::class);
     }
 
     /**

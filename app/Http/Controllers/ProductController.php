@@ -14,7 +14,12 @@ use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Validator;
+use OpenApi\Attributes as OA;
 
+#[
+    OA\Info(version: "1.0.0", description: "Product API", title: "product-api Documentation"),
+    OA\Server(url: 'http://localhost', description: "local server"),
+]
 class ProductController extends Controller
 {
     public function __construct(
@@ -22,11 +27,41 @@ class ProductController extends Controller
     ) {
     }
 
+    #[OA\Get(
+        path: '/api/product',
+        summary: 'Get a list of products',
+        responses: [
+            new OA\Response(
+                response:200,
+                description: "Successful operation"
+            ),
+        ]
+    )]
     public function index(): Collection
     {
         return Product::all();
     }
 
+    #[OA\Get(
+        path: '/api/product/{id}',
+        summary: 'Get a product',
+        parameters:[ new OA\Parameter(
+            name: "id",
+            description: "id of the product",
+            in: 'path',
+            required: true,
+        )],
+        responses: [
+            new OA\Response(
+                response:200,
+                description: "Successful operation"
+            ),
+            new OA\Response(
+                response:404,
+                description: "Product not found"
+            ),
+        ]
+    )]
     /**
      * @throws ApiParametersValidationException
      * @throws ModelNotFoundException<Model>
@@ -40,6 +75,42 @@ class ProductController extends Controller
         )->toArray();
     }
 
+    #[OA\Put(
+        path: '/api/product/{id}',
+        summary: 'Update a product',
+        requestBody: new OA\RequestBody(required: true,
+            content: new OA\MediaType(mediaType: "application/json",
+                schema: new OA\Schema(
+                    properties: [
+                        new OA\Property(property: 'title', description: "Product title", type: "string"),
+                        new OA\Property(property: 'price', description: "Product description", type: "float"),
+                        new OA\Property(property: 'description', description: "Product price", type: "string"),
+                        new OA\Property(property: 'image', description: "image of the product", type: "string")
+                    ]
+                )
+            )
+        ),
+        parameters:[ new OA\Parameter(
+            name: "id",
+            description: "id of the product",
+            in: 'path',
+            required: true,
+        )],
+        responses: [
+            new OA\Response(
+                response:201,
+                description: "Product successfully updated"
+            ),
+            new OA\Response(
+                response:404,
+                description: "Product not found"
+            ),
+            new OA\Response(
+                response:500,
+                description: "When an error occure"
+            ),
+        ]
+    )]
     /**
      * @throws ApiParametersValidationException
      * @throws ApiBodyValidationException
@@ -84,7 +155,7 @@ class ProductController extends Controller
         );
 
         $validation = Validator::make(
-            request()?->route()?->parameters(),
+            $content,
             [
                 'title' => 'string',
                 'price' => 'decimal:0,2|gt:0',
