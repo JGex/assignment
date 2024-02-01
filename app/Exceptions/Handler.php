@@ -3,6 +3,7 @@
 namespace App\Exceptions;
 
 use App\Http\Exception\AbstractApiRequestException;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
