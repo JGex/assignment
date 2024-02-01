@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Log;
 class ImportProduct extends Command
 {
     protected $signature = 'product:import
-                            {source? : The source of the products to import}';
+                            {source : The source of the products to import}';
     protected $description = 'Import products from a specific source';
     private ?ProductImporterInterface $source;
 
@@ -42,8 +42,9 @@ class ImportProduct extends Command
             $this->productRepository->createFromCollection($this->source->getProducts());
         } catch (\InvalidArgumentException $e) {
             return $this->logAndFail(
-                $e,
-                $e->getMessage(),
+                e: $e,
+                message: $e->getMessage(),
+                exitCode: self::INVALID
             );
         } catch (AbstractValidationException $e) {
             return $this->logAndFail(
@@ -90,8 +91,13 @@ class ImportProduct extends Command
         ]);
     }
 
-    private function logAndFail(\Exception $e, string $message, array $table = [], ?string $details = null): int
-    {
+    private function logAndFail(
+        \Exception $e,
+        string $message,
+        array $table = [],
+        ?string $details = null,
+        int $exitCode = self::FAILURE
+    ): int {
         $this->log($e);
         $this->error($message);
 
@@ -103,6 +109,6 @@ class ImportProduct extends Command
             $this->warn(sprintf('Details : %s', $details));
         }
 
-        return self::FAILURE;
+        return $exitCode;
     }
 }

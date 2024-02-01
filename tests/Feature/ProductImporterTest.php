@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Exception\RuntimeException;
 use Tests\TestCase;
 
 class ProductImporterTest extends TestCase
@@ -30,13 +31,15 @@ class ProductImporterTest extends TestCase
 
     public function test_import_command_arguments(): void
     {
+        $this->expectException(RuntimeException::class);
+
         $this->artisan('product:import')
-            ->expectsOutput('The source must be in the following : FakeStore')
-            ->assertExitCode(Command::FAILURE);
+            ->expectsOutput('Not enough arguments (missing: "source").')
+            ->assertExitCode(Command::INVALID);
 
         $this->artisan('product:import test')
             ->expectsOutput('The source must be in the following : FakeStore')
-            ->assertExitCode(Command::FAILURE);
+            ->assertExitCode(Command::INVALID);
 
         $this->assertDatabaseCount('products', 0);
         $this->assertDatabaseCount('categories', 0);
