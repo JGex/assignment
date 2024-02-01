@@ -18,7 +18,7 @@ use Illuminate\Support\Carbon;
  * @property string $description
  * @property int $category_id
  * @property string $image
- * @property mixed $rating
+ * @property array<string, int|float> $rating
  * @property int|null $fake_store_id
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
