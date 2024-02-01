@@ -14,9 +14,12 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::apiResource('product', ProductController::class)
-    ->only([
-        'index', 'show', 'update'
-    ])
-;
+Route::middleware(['auth:sanctum', 'ability:api:product'])->group(function () {
+    Route::get('/product', [ProductController::class, 'index']);
 
+    Route::get('/product/{id}', [ProductController::class, 'show'])
+        ->whereNumber('id');
+
+    Route::put('/product/{id}', [ProductController::class, 'update'])
+        ->whereNumber('id');
+});
