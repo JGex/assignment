@@ -2,12 +2,13 @@
 
 namespace App\Exceptions;
 
-use App\Http\Exception\AbstractApiRequestException;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Response;
-use Symfony\Component\HttpFoundation\Exception\BadRequestException;
+use Illuminate\Support\Facades\Log;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 use Throwable;
 
 class Handler extends ExceptionHandler
@@ -35,13 +36,24 @@ class Handler extends ExceptionHandler
 
     public function render($request, Throwable $e): JsonResponse
     {
-        $status = Response::HTTP_INTERNAL_SERVER_ERROR;
+        Log::error($e->getMessage(), [
+            'context' => 'API',
+            'domain' => 'HANDLER',
+            'exception' => $e,
+        ]);
+
+        return new JsonResponse(
+            $this->getDataFromException($e),
+            $this->getStatusFromException($e)
+        );
+    }
+
+    private function getDataFromException(Throwable $e): array
+    {
         $data = [
             'success' => false,
             'code' => $e->getCode(),
-            'message' => [
-                $e->getMessage(),
-            ],
+            'message' => $e->getMessage(),
         ];
 
         if (env('APP_ENV') !== 'production') {
@@ -51,15 +63,21 @@ class Handler extends ExceptionHandler
             $data['previous'] = $e->getPrevious();
         }
 
-        if ($e instanceof BadRequestException) {
-            $status = Response::HTTP_BAD_REQUEST;
+        return $data;
+    }
+
+    private function getStatusFromException(Throwable $e): int
+    {
+        $status = Response::HTTP_INTERNAL_SERVER_ERROR;
+
+        if ($e instanceof HttpException) {
+            $status = $e->getStatusCode();
         } elseif ($e instanceof ModelNotFoundException) {
             $status = Response::HTTP_NOT_FOUND;
-        } elseif ($e instanceof AbstractApiRequestException) {
-            $status = $e->getStatus();
-            $data['details'] = $e->getDetails();
+        } elseif ($e instanceof AuthenticationException) {
+            $status = Response::HTTP_UNAUTHORIZED;
         }
 
-        return new JsonResponse($data, $status);
+        return $status;
     }
 }
