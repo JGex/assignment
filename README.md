@@ -42,8 +42,8 @@ make init
 
 ## Usage
 
-A Makefile is provided to help the user using application's commands.  
-The makefile do not accept arguments, else you must pass variable with the command
+A Makefile is provided to help the developer using application's commands.  
+Make do not accept arguments, else you must pass variable with the command
 
 ### Containers
 
@@ -73,7 +73,7 @@ CONTAINER="laravel.test" # to display logs related to laravel container
 
 A tool is provided to add PHPDoc comment on models, facade and PhpStorm meta.  
 Actually, only PHPDoc models are generated.  
-If you want to know more about it, check this [link](https://github.com/barryvdh/laravel-ide-helper)
+More details [here](https://github.com/barryvdh/laravel-ide-helper)
 
 To generate PHPDoc model, run
 ```bash
@@ -88,7 +88,7 @@ Then it will be available here http://localhost/api/documentation
 ```bash
 make sail-artisan CMD="l5-swagger:generate"
 ```
-If you want to know how it works, you can check this [link](https://github.com/DarkaOnLine/L5-Swagger)
+More details [here](https://github.com/DarkaOnLine/L5-Swagger)
 
 
 ### Command
@@ -114,7 +114,7 @@ If you want to use the API you need a bearer token. To generate one, you need tu
 make sail-artisan CMD="user:token:upsert user@mail.com"
 ```
 The prompte will give you a usable token  
-You regenerate the token if the user is already created
+The token is regenerated if the user is already created
 
 
 #### API
@@ -125,7 +125,7 @@ To see the routes available, check the APIDoc section
 
 To fetch the API, you need a bearer token. see the _user:token:upsert_ section
 
-example to fetch thr product list : 
+example to fetch the product list : 
 
 ```bash
 curl -X 'GET' \
@@ -140,4 +140,4 @@ If we are planning to update the project, here are some possible improvements
 - Improve ApiClient to allow other http methods, only get is actually allowed
 - Improve product's image on import, download it, check if it's a valid image, store it locally
 - Add a logger decorator to add a _context_ and _domaine_ for the log, it will help if the log is parsed in a monitoring tool
-- Add cache on the product list, revoked by the update route and laravel synchronize command
+- Add cache on the product list, revoked by the update route and the synchronize command
