@@ -141,3 +141,7 @@ If we are planning to update the project, here are some possible improvements
 - Improve product's image on import, download it, check if it's a valid image, store it locally
 - Add a logger decorator to add a _context_ and _domaine_ for the log, it will help if the log is parsed in a monitoring tool
 - Add cache on the product list, revoked by the update route and the synchronize command
+- :warning: Actually, the API Doc is generated with the url http://localhost if the default application's port si not 80 in the .env, the API Doc will not work
+  - Quick fix: change the url in the ProductController on line 18
+  - Generate new API Doc with `make sail-artisan CMD="l5-swagger:generate"`
+
