@@ -40,6 +40,10 @@ class ProductController extends Controller
                 response: 200,
                 description: "Successful operation"
             ),
+            new OA\Response(
+                response: 401,
+                description: "User not authenticated"
+            ),
         ]
     )]
     public function index(): Collection
@@ -63,6 +67,10 @@ class ProductController extends Controller
             new OA\Response(
                 response: 200,
                 description: "Successful operation"
+            ),
+            new OA\Response(
+                response: 401,
+                description: "User not authenticated"
             ),
             new OA\Response(
                 response: 404,
@@ -110,12 +118,12 @@ class ProductController extends Controller
                 description: "Product successfully updated"
             ),
             new OA\Response(
-                response: 404,
-                description: "Product not found"
+                response: 401,
+                description: "User not authenticated"
             ),
             new OA\Response(
-                response: 500,
-                description: "When an error occure"
+                response: 404,
+                description: "Product not found"
             ),
         ]
     )]
