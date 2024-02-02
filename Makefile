@@ -60,6 +60,12 @@ endif
 ## SAIL commands
 ####
 
+init: ## Run this command for the first initialisation
+	@$(PRE_CMD)
+	docker run --rm -u "$(shell id -u):$(shell id -g)" -v $(shell pwd):/var/www/html -w /var/www/html laravelsail/php83-composer:latest composer install
+	@$(PRE_CMD)
+	docker-compose up -d
+
 sail-up: ## Build and start the containers in the docker-compose
 	@$(PRE_CMD)
 	$(SAIL) up --detach --remove-orphans
@@ -84,15 +90,15 @@ sail-log: ## TAIL="20" CONTAINER="" Display the $(TAIL) last logs of the contain
 	@$(PRE_CMD)
 	$(SAIL) logs -f --tail="$(TAIL)" $(CONTAINER)
 
-php-artisan: ## CMD="-h" Run an artisan command $(CMD)
+sail-artisan: ## CMD="-h" Run an artisan command $(CMD)
 	@$(PRE_CMD)
 	$(CMD_ARTISAN) $(CMD)
 
-php: ## CMD="-h" Run a php command $(CMD)
+sail-php: ## CMD="-h" Run a php command $(CMD)
 	@$(PRE_CMD)
 	$(CMD_PHP) $(CMD)
 
-composer: ## CMD="-h" Run a composer command $(CMD)
+sail-composer: ## CMD="-h" Run a composer command $(CMD)
 	@$(PRE_CMD)
 	$(CMD_COMPOSER) $(CMD)
 
